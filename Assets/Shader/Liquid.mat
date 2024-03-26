@@ -63,7 +63,7 @@ Material:
     m_Floats:
     - _EnableExternalAlpha: 0
     - _FillAmount: 0.01
-    - _FillAmount1: -10.65
+    - _FillAmount1: -2.58
     - _FillAmount2: -0.5
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}

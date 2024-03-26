@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Random = System.Random;
-
+//using Input = InputWrapper.Input;
 public class BottleController : MonoBehaviour
 {
     public Color[] liquidColor;
@@ -20,49 +20,52 @@ public class BottleController : MonoBehaviour
     [FormerlySerializedAs("Min")] public Transform min;
     public TextMeshProUGUI status;
     private static float _spriteSize;
-
     private void Start()
     {
+        _isEnd = false;
         _spriteSize = sRenderer.bounds.size.y;
         _beerHight = - _spriteSize / 2;
         _foamHight = - _spriteSize / 2;
         max.position = new Vector2(max.position.x,UnityEngine.Random.Range(0.0f, _spriteSize/ 2));
         min.position = new Vector2(min.position.x,UnityEngine.Random.Range(-_spriteSize/ 4, max.position.y - _spriteSize/ 10));
         Debug.Log(_spriteSize + " Max: " + max.position.y + " Min: " + min.position.y);
+        liquidSpriteRenderer[0].material.SetFloat("_FillAmount1", _beerHight);
+        liquidSpriteRenderer[1].material.SetFloat("_FillAmount1", _foamHight);
     }
 
     private void FixedUpdate()
     {
-        if(!_isStop && _beerHight < 2.58f && _foamHight < 2.58f)
-        {
-            _beerHight += 0.015f;
-            _foamHight += 0.025f;
-            liquidSpriteRenderer[0].material.SetFloat("_FillAmount1", _beerHight);
-            liquidSpriteRenderer[1].material.SetFloat("_FillAmount1", _foamHight);
-        }
-        else
-        {
-            if(!_isEnd)
-            {
-                var c = _foamHight - _beerHight;
-                _temp = _beerHight + c / 2.5f;
-                _isEnd = true;
-            }
-            _foamHight -= 0.015f;
-            liquidSpriteRenderer[1].material.SetFloat("_FillAmount1", _foamHight);
-            if (!(_beerHight < _temp))
-            {
-                CheckResult();
-                return;
-            }
-            _beerHight += 0.01f;
-            liquidSpriteRenderer[0].material.SetFloat("_FillAmount1", _beerHight);
-        }
+        // if(!_isStop && _beerHight < 2.58f && _foamHight < 2.58f)
+        // {
+        //     _beerHight += 0.015f;
+        //     _foamHight += 0.025f;
+        //     liquidSpriteRenderer[0].material.SetFloat("_FillAmount1", _beerHight);
+        //     liquidSpriteRenderer[1].material.SetFloat("_FillAmount1", _foamHight);
+        // }
+        // else
+        // {
+        //     if(!_isEnd)
+        //     {
+        //         var c = _foamHight - _beerHight;
+        //         _temp = _beerHight + c / 2.5f;
+        //         _isEnd = true;
+        //     }
+        //     _foamHight -= 0.015f;
+        //     liquidSpriteRenderer[1].material.SetFloat("_FillAmount1", _foamHight);
+        //     if (!(_beerHight < _temp))
+        //     {
+        //         CheckResult();
+        //         return;
+        //     }
+        //     _beerHight += 0.01f;
+        //     liquidSpriteRenderer[0].material.SetFloat("_FillAmount1", _beerHight);
+        // }
+        Test();
     }
 
     public void OnClick()
     {
-        _isStop = true;
+        //_isStop = true;
     }
     
     private void CheckResult()
@@ -89,16 +92,38 @@ public class BottleController : MonoBehaviour
     {
         if (Input.touchCount > 0)
         {
-            Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began)
+            var touch = Input.GetTouch(0);
+            if (!_isEnd && touch.phase == TouchPhase.Stationary)
             {
                 // GAMEPLAY
+                if(_beerHight < 2.58f && _foamHight < 2.58f)
+                {
+                    _beerHight += 0.015f;
+                    _foamHight += 0.025f;
+                    liquidSpriteRenderer[0].material.SetFloat("_FillAmount1", _beerHight);
+                    liquidSpriteRenderer[1].material.SetFloat("_FillAmount1", _foamHight);
+                }
             }
 
-            if (touch.phase is TouchPhase.Ended or TouchPhase.Canceled)
+            if (!_isEnd && touch.phase is TouchPhase.Ended or TouchPhase.Canceled)
             {
-                // CHECK RESULT 
+                _isEnd = true;
+                var c = _foamHight - _beerHight;
+                _temp = _beerHight + c / 2.5f;
             }
+            
+        }
+        if (_isEnd)
+        {
+            _foamHight -= 0.015f;
+            liquidSpriteRenderer[1].material.SetFloat("_FillAmount1", _foamHight);
+            if (!(_beerHight < _temp))
+            {
+                CheckResult();
+                return;
+            }
+            _beerHight += 0.01f;
+            liquidSpriteRenderer[0].material.SetFloat("_FillAmount1", _beerHight);
         }
     }
 }
