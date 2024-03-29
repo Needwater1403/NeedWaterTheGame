@@ -15,6 +15,8 @@ public class BottleController : MonoBehaviour
     private float _foamHight;
     private float _temp;
     private bool _isStop;
+    private float endPos;
+    private float startPos;
     private GameState _state;
     public SpriteRenderer[] liquidSpriteRenderer;
     public SpriteRenderer sRenderer;
@@ -25,6 +27,10 @@ public class BottleController : MonoBehaviour
     private int _score = 0;
     private void Start()
     {
+        var bound = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
+        endPos = bound.x + sRenderer.bounds.size.x / 2f + 1;
+        startPos =  - endPos;
+        transform.position = new Vector3(startPos, transform.position.y, 0);
         ResetParam();
     }
 
@@ -38,6 +44,7 @@ public class BottleController : MonoBehaviour
     {
         if (Input.touchCount > 0 && _state == GameState._start)
         {
+            
             _isStop = true;
             var touch = Input.GetTouch(0);
             switch (touch.phase)
@@ -89,13 +96,14 @@ public class BottleController : MonoBehaviour
     }
     IEnumerator SlideOutTransition()
     {
+        status.DOFade(0, 1.2f);
         min.GetComponent<SpriteRenderer>().material.DOFade(0,.6f);
         max.GetComponent<SpriteRenderer>().material.DOFade(0,.6f);
         yield return new WaitForSeconds(.6f);
         var position = transform.position;
-        gameObject.transform.DOMove(new Vector3(8.8f, position.y, 0),2,false);
+        gameObject.transform.DOMove(new Vector3(endPos, position.y, 0),2,false);
         yield return new WaitForSeconds(2f);
-        gameObject.transform.position = new Vector3(-8.8f, position.y, 0);
+        gameObject.transform.position = new Vector3(startPos, position.y, 0);
         ResetParam();
         yield return null;
     }
@@ -117,7 +125,6 @@ public class BottleController : MonoBehaviour
         _foamHight = - _spriteSize / 2;
         max.position = new Vector2(max.position.x,UnityEngine.Random.Range(0.0f, _spriteSize/ 2));
         min.position = new Vector2(min.position.x,UnityEngine.Random.Range(-_spriteSize/ 4, max.position.y - _spriteSize/ 10));
-        Debug.Log(_spriteSize + " Max: " + max.position.y + " Min: " + min.position.y);
         liquidSpriteRenderer[0].material.SetFloat("_FillAmount1", _beerHight);
         liquidSpriteRenderer[1].material.SetFloat("_FillAmount1", _foamHight);
         //status.SetText("");
@@ -126,24 +133,20 @@ public class BottleController : MonoBehaviour
     private void CheckResult()
     {
         //CHECK WIN CONDITION (Min <= a <= Max)
-        //if(status.gameObject.activeInHierarchy) return;
         var minValue = min.localPosition.y;
         var maxValue = max.localPosition.y;
         if (_beerHight < maxValue && _beerHight > minValue)
         {
-            //_state = GameState._end;
             _score++;
             status.SetText(_score.ToString());
             StartCoroutine(SlideOutTransition());
             status.gameObject.SetActive(true);
-            Debug.Log("a = " + _beerHight + " maxValue = " + maxValue + " minValue = " + minValue + " state = " + _state.ToString());
+            //Debug.Log("a = " + _beerHight + " maxValue = " + maxValue + " minValue = " + minValue + " state = " + _state.ToString());
         }
         else
         {
-            //_state = GameState._end;
             status.SetText("YOU LOSE!");
             status.gameObject.SetActive(true);
-            Debug.Log("a = " + _beerHight + " maxValue = " + maxValue + " minValue = " + minValue + " state = " + _state.ToString());
         }
     }
 }
