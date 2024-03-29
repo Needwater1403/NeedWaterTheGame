@@ -96,7 +96,6 @@ public class BottleController : MonoBehaviour
     }
     IEnumerator SlideOutTransition()
     {
-        status.DOFade(0, 1.2f);
         min.GetComponent<SpriteRenderer>().material.DOFade(0,.6f);
         max.GetComponent<SpriteRenderer>().material.DOFade(0,.6f);
         yield return new WaitForSeconds(.6f);
