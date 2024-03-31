@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using Random = System.Random;
 using DG.Tweening;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 //using Input = InputWrapper.Input;
 public class BottleController : MonoBehaviour
@@ -23,6 +25,8 @@ public class BottleController : MonoBehaviour
     [FormerlySerializedAs("Max")] public Transform max;
     [FormerlySerializedAs("Min")] public Transform min;
     public TextMeshProUGUI status;
+    public TextMeshProUGUI buttonText;
+    public Button button;
     private static float _spriteSize;
     private int _score = 0;
     private void Start()
@@ -147,7 +151,14 @@ public class BottleController : MonoBehaviour
         {
             Debug.Log("a = " + _beerHight + " maxValue = " + maxValue + " minValue = " + minValue + " state = " + _state.ToString());
             status.SetText("YOU LOSE!");
+            buttonText.SetText("Return to main menu");
+            button.interactable = true;
             status.gameObject.SetActive(true);
         }
+    }
+
+    public void ReturnToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }
