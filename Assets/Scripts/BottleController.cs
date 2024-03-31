@@ -10,7 +10,7 @@ using DG.Tweening;
 //using Input = InputWrapper.Input;
 public class BottleController : MonoBehaviour
 {
-    private enum GameState  {_start,_isPlaying, _end};
+    private enum GameState  {_start,_isPlaying, _end, _wait};
     private float _beerHight;
     private float _foamHight;
     private float _temp;
@@ -27,6 +27,7 @@ public class BottleController : MonoBehaviour
     private int _score = 0;
     private void Start()
     {
+        _state = GameState._wait;
         var bound = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
         endPos = bound.x + sRenderer.bounds.size.x / 2f + 1;
         startPos =  - endPos;
@@ -144,6 +145,7 @@ public class BottleController : MonoBehaviour
         }
         else
         {
+            Debug.Log("a = " + _beerHight + " maxValue = " + maxValue + " minValue = " + minValue + " state = " + _state.ToString());
             status.SetText("YOU LOSE!");
             status.gameObject.SetActive(true);
         }
